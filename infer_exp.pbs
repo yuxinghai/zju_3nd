@@ -1,0 +1,10 @@
+#!/bin/bash
+des_dir=/data2/zhoulab/yuxinghai/zju/3nd_analysis/results/02_mapping/sorted
+bed=/data2/zhoulab/yuxinghai/zju/anno/ce11/ce11_ws245.bed
+NAMES=(911 912 913 914 915 916 917 918) 
+numLanes=${#NAMES[@]}
+for (( i=0; i<${numLanes}; i++ )); do
+    name=${NAMES[$i]}
+    bam=${des_dir}/${name}/${name}_uniq.bam
+    infer_experiment.py -s 20000000 -r ${bed} -i ${bam}
+done
