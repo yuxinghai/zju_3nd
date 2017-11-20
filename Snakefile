@@ -7,10 +7,12 @@ script_dir="/data2/zhoulab/yuxinghai/zju/3nd_analysis/bin/script"
 figure_dir="/data2/zhoulab/yuxinghai/zju/3nd_analysis/results/03_featurecount/figure"
 results_dir="/data2/zhoulab/yuxinghai/zju/3nd_analysis/results/03_featurecount"
 gene_SCF_dir="/data2/zhoulab/yuxinghai/zju/3nd_analysis/geneSCF-master-source-v1.1-p2"
-samples = ["911","912","913","914","915","916","917","918"]
+samples = ["903","905","907","909","911","913","915","917","923","935","937","939","941","943","945","947","904","906","908","910","912","914","916","918","924","936","938","940","942","944","946","948"]
 gene_list=["up","down","sig"]
 exp_level=["up_Gene_sym","down_Gene_sym","sig_Gene_sym"]
+period=["h_2","h_8","h_12","h_24"]
 Tea_Dirctory_dir="/data2/zhoulab/yuxinghai/zju/anno/TEA_directory"
+chrom_size="/data2/zhoulab/yuxinghai/zju/anno/ce11/ce11.chrom.sizes"
 
 
 rule all:
@@ -28,25 +30,33 @@ rule all:
 	expand("{work_dir}/02_mapping/sorted/{dataset}/{dataset}_uniq_sort.bam",work_dir=work_dir, dataset=samples),
         expand("{work_dir}/03_featurecount/{dataset}_featureCounts.txt", work_dir=work_dir, dataset=samples),
         expand("{work_dir}/03_featurecount/{dataset}_featureStat.log", work_dir=work_dir, dataset=samples),
-        expand("{figure_dir}/sample_distance.pdf", figure_dir=figure_dir),
-        expand("{figure_dir}/damage_vs_control_MAplot.png", figure_dir=figure_dir),
-        expand("{figure_dir}/Gene_number_in_DE_level.pdf", figure_dir=figure_dir),
-        expand("{results_dir}/gene_name/up", results_dir=results_dir),
-        expand("{results_dir}/gene_name/down", results_dir=results_dir),
-        expand("{results_dir}/gene_name/sig", results_dir=results_dir),
-        expand("{results_dir}/gene_name/gene_SCF/up_Gene_sym", results_dir=results_dir),
-        expand("{results_dir}/gene_name/gene_SCF/down_Gene_sym", results_dir=results_dir),
-        expand("{results_dir}/DEgene/damage_vs_control_downgene.csv", results_dir=results_dir),
-        expand("{results_dir}/DEgene/damage_vs_control_upgene.csv", results_dir=results_dir),
-        expand("{results_dir}/DEgene/ano_damage_vs_control_downgene.csv", results_dir=results_dir),
-        expand("{results_dir}/DEgene/ano_damage_vs_control_upgene.csv", results_dir=results_dir),
-        expand("{results_dir}/gene_name/gene_SCF/sig_Gene_sym", results_dir=results_dir),
-        expand("{results_dir}/gene_name/gene_SCF/{exp_level}", results_dir=results_dir,exp_level=exp_level),
-        expand("{results_dir}/gene_name/gene_SCF_result/{exp_level}/{exp_level}_GO_all_wb_functional_classification.tsv", results_dir=results_dir,exp_level=exp_level),
-        expand("{results_dir}/gene_name/gene_SCF_result/{exp_level}/{exp_level}_KEGG_cel_enrichment_plot.pdf", results_dir=results_dir,exp_level=exp_level),
-        expand("{results_dir}/gene_name/TEA/{gene_list}_tissue.svg", results_dir=results_dir,gene_list=gene_list),
-        expand("{results_dir}/gene_name/TEA/{gene_list}_go.svg", results_dir=results_dir,gene_list=gene_list),
-        expand("{results_dir}/gene_name/TEA/{gene_list}_phenotype.svg", results_dir=results_dir,gene_list=gene_list)
+        expand("{figure_dir}/h_12_sample_distance.pdf",figure_dir=figure_dir),
+        expand("{figure_dir}/h_8_sample_distance.pdf",figure_dir=figure_dir),
+        expand("{figure_dir}/h_2_sample_distance.pdf",figure_dir=figure_dir),
+	expand("{figure_dir}/h_24_sample_distance.pdf",figure_dir=figure_dir),
+	expand("{results_dir}/gene_name/gene_SCF/h_2/down_Gene_sym",results_dir=results_dir),
+	expand("{results_dir}/gene_name/gene_SCF/h_8/down_Gene_sym",results_dir=results_dir),
+	expand("{results_dir}/gene_name/gene_SCF/h_12/down_Gene_sym",results_dir=results_dir),
+	expand("{results_dir}/gene_name/gene_SCF/h_24/down_Gene_sym",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_24/ano_downgene.csv",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_24/ano_upgene.csv",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_12/ano_downgene.csv",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_12/ano_upgene.csv",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_2/ano_downgene.csv",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_2/ano_upgene.csv",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_8/ano_downgene.csv",results_dir=results_dir),
+        expand("{results_dir}/DEgene/h_8/ano_upgene.csv",results_dir=results_dir),
+	expand("{work_dir}/02_mapping/sorted/{dataset}/{dataset}_uniq_sort.bam.bai",work_dir=work_dir,dataset=samples),
+        expand("{work_dir}/bw/{dataset}.wig",work_dir=work_dir,dataset=samples),
+        expand("{work_dir}/bw/{dataset}.bw",work_dir=work_dir,dataset=samples),
+	expand("{results_dir}/gene_name/TEA/{period}/{gene_list}_tissue.svg",results_dir=results_dir,period=period,gene_list=gene_list),
+	expand("{results_dir}/gene_name/TEA/{period}/{gene_list}_go.svg",results_dir=results_dir,period=period,gene_list=gene_list),
+	expand("{results_dir}/gene_name/TEA/{period}/{gene_list}_phenotype.svg",results_dir=results_dir,period=period,gene_list=gene_list)
+
+
+
+
+
 
 
 rule fastqc:
@@ -149,7 +159,7 @@ rule uniquebam_sort_and_index:
     threads: 20
 
     shell:
-        "samtools view -@ 20 {input} -o {output}"
+        "samtools sort -@ 20 {input} -o {output}"
 
 
 rule bam_index_and_2bw:
@@ -164,7 +174,7 @@ rule bam_index_and_2bw:
     shell:
         """
         samtools index {input}
-        bam2wig.py -i {input} -o {bw_dir}/{dataset} -t 1000000000 -s {chrom_size} -u
+        bam2wig.py -i {input} -o {bw_dir}/{wildcards.dataset} -t 1000000000 -s {chrom_size} -u
         """
 
 rule feature_count:
@@ -181,73 +191,103 @@ rule feature_count:
 rule sample_distance_plot:
     input:
         expand("{work_dir}/03_featurecount/{dataset}_featureCounts.txt",work_dir=work_dir, dataset=samples)
-
+ 
     output:
-        "{figure_dir}/sample_distance.pdf"
-
+        "{figure_dir}/h_12_sample_distance.pdf",
+        "{figure_dir}/h_2_sample_distance.pdf",
+        "{figure_dir}/h_8_sample_distance.pdf",
+        "{figure_dir}/h_24_sample_distance.pdf",
+        
     shell:
         "Rscript {script_dir}/distance.R --latency-wait"
 
 
-rule DEgene_filter_and_plot:
+rule DEgene_filter_and_plot_h2:
     input:
         expand("{work_dir}/03_featurecount/{dataset}_featureCounts.txt",work_dir=work_dir, dataset=samples)
 
     output:
-        "{results_dir}/figure/damage_vs_control_MAplot.png",
-        "{results_dir}/figure/Gene_number_in_DE_level.pdf",
-        "{results_dir}/gene_name/up",
-        "{results_dir}/gene_name/down",
-        "{results_dir}/gene_name/sig",
-        "{results_dir}/gene_name/gene_SCF/up_Gene_sym",
-        "{results_dir}/gene_name/gene_SCF/down_Gene_sym",
-        "{results_dir}/DEgene/damage_vs_control_downgene.csv",
-        "{results_dir}/DEgene/damage_vs_control_upgene.csv",
-        "{results_dir}/DEgene/ano_damage_vs_control_downgene.csv",
-        "{results_dir}/DEgene/ano_damage_vs_control_upgene.csv"
+        "{results_dir}/figure/h_2/MAplot.png",
+        "{results_dir}/figure/h_2/DE_number.pdf",
+        "{results_dir}/gene_name/h_2/up",
+        "{results_dir}/gene_name/h_2/down",
+        "{results_dir}/gene_name/h_2/sig",
+        "{results_dir}/gene_name/gene_SCF/h_2/up_Gene_sym",
+        "{results_dir}/gene_name/gene_SCF/h_2/down_Gene_sym",
+        "{results_dir}/DEgene/h_2/ano_downgene.csv",
+        "{results_dir}/DEgene/h_2/ano_upgene.csv"
 
     shell:
-        "Rscript {script_dir}/damage_deseq_refilter.R"
+        "Rscript {script_dir}/h2_deseq_refilter.R --latency-wait"
 
-rule prepare_geneSCF_input:
+rule DEgene_filter_and_plot_h8:
     input:
-        up="{results_dir}/gene_name/gene_SCF/up_Gene_sym",
-        down="{results_dir}/gene_name/gene_SCF/down_Gene_sym"
+        expand("{work_dir}/03_featurecount/{dataset}_featureCounts.txt",work_dir=work_dir, dataset=samples)
 
     output:
-        sig="{results_dir}/gene_name/gene_SCF/sig_Gene_sym"
+        "{results_dir}/figure/h_8/MAplot.png",
+        "{results_dir}/figure/h_8/DE_number.pdf",
+        "{results_dir}/gene_name/h_8/up",
+        "{results_dir}/gene_name/h_8/down",
+        "{results_dir}/gene_name/h_8/sig",
+        "{results_dir}/gene_name/gene_SCF/h_8/up_Gene_sym",
+        "{results_dir}/gene_name/gene_SCF/h_8/down_Gene_sym",
+        "{results_dir}/DEgene/h_8/ano_downgene.csv",
+        "{results_dir}/DEgene/h_8/ano_upgene.csv"
+
     shell:
-        """
-        cat {input.up} {input.down} >{output.sig}
-        """
+        "Rscript {script_dir}/h8_deseq_refilter.R --latency-wait"
 
-
-rule gene_SCF:
+rule DEgene_filter_and_plot_h12:
     input:
-        "{results_dir}/gene_name/gene_SCF/{exp_level}"
+        expand("{work_dir}/03_featurecount/{dataset}_featureCounts.txt",work_dir=work_dir, dataset=samples)
 
     output:
-        "{results_dir}/gene_name/gene_SCF_result/{exp_level}/{exp_level}_GO_all_wb_functional_classification.tsv",
-        "{results_dir}/gene_name/gene_SCF_result/{exp_level}/{exp_level}_KEGG_cel_enrichment_plot.pdf"
-
+        "{results_dir}/figure/h_12/MAplot.png",
+        "{results_dir}/figure/h_12/DE_number.pdf",
+        "{results_dir}/gene_name/h_12/up",
+        "{results_dir}/gene_name/h_12/down",
+        "{results_dir}/gene_name/h_12/sig",
+        "{results_dir}/gene_name/gene_SCF/h_12/up_Gene_sym",
+        "{results_dir}/gene_name/gene_SCF/h_12/down_Gene_sym",
+        "{results_dir}/DEgene/h_12/ano_downgene.csv",
+        "{results_dir}/DEgene/h_12/ano_upgene.csv"
 
     shell:
-        "{gene_SCF_dir}/geneSCF_batch"
+        "Rscript {script_dir}/h12_deseq_refilter.R --latency-wait"
+
+rule DEgene_filter_and_plot_h24:
+    input:
+        expand("{work_dir}/03_featurecount/{dataset}_featureCounts.txt",work_dir=work_dir, dataset=samples)
+
+    output:
+        "{results_dir}/figure/h_24/MAplot.png",
+        "{results_dir}/figure/h_24/DE_number.pdf",
+        "{results_dir}/gene_name/h_24/up",
+        "{results_dir}/gene_name/h_24/down",
+        "{results_dir}/gene_name/h_24/sig",
+        "{results_dir}/gene_name/gene_SCF/h_24/up_Gene_sym",
+        "{results_dir}/gene_name/gene_SCF/h_24/down_Gene_sym",
+        "{results_dir}/DEgene/h_24/ano_downgene.csv",
+        "{results_dir}/DEgene/h_24/ano_upgene.csv"
+
+    shell:
+        "Rscript {script_dir}/h24_deseq_refilter.R --latency-wait"
+
+
+
 
 
 rule TEA:
     input:
-        "{results_dir}/gene_name/{gene_list}"
+        "{results_dir}/gene_name/{period}/{gene_list}"
 
     output:
-        "{results_dir}/gene_name/TEA/{gene_list}_tissue.svg",
-        "{results_dir}/gene_name/TEA/{gene_list}_go.svg",
-        "{results_dir}/gene_name/TEA/{gene_list}_phenotype.svg"
+        "{results_dir}/gene_name/TEA/{period}/{gene_list}_tissue.svg",
+        "{results_dir}/gene_name/TEA/{period}/{gene_list}_go.svg",
+        "{results_dir}/gene_name/TEA/{period}/{gene_list}_phenotype.svg"
 
     shell:
         """
-        bash {script_dir}/tea.sh
-        mv down_* {results_dir}/gene_name/TEA
-        mv up_* {results_dir}/gene_name/TEA
-        mv sig_* {results_dir}/gene_name/TEA
+        bash {script_dir}/tea.sh {wildcards.period}
         """
