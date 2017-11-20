@@ -471,7 +471,7 @@ if __name__ == '__main__':
     parser.add_argument('kind', help='What kind of analysis will be ' +
                         'performed. One of `tissue`, `phenotype` or `go`',
                         type=str)
-    parser.add_argument("-d", '--dictionary', nargs='?', help='Provide a\
+    parser.add_argument("-d", '--tissue_dictionary', nargs='?', help='Provide a\
                         dictionary to test. If none given, WormBase URL \
                         will be used to download the corresponding file')
     parser.add_argument("-q", help='Qvalue threshold for significance. \
@@ -487,7 +487,7 @@ if __name__ == '__main__':
     title = args.title
 
     # optional args
-    if args.dictionary:
+    if args.tissue_dictionary:
         dict_name = args.tissue_dictionary
         dictionary = pd.read_csv(dict_name)
     else:

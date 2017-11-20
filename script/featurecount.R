@@ -1,6 +1,6 @@
 library("Rsubread")
 gtf<- '/data2/zhoulab/yuxinghai/zju/anno/ce11/c_elegans.PRJNA13758.WS258.canonical_geneset.gtf'
-name <-c("911","912","913","914","915","916","917","918")
+name <-c("903","905","907","909","911","913","915","917","923","935","937","939","941","943","945","947","904","906","908","910","912","914","916","918","924","936","938","940","942","944","946","948")
 raw_dir<-'/data2/zhoulab/yuxinghai/zju/3nd_analysis/results/02_mapping/sorted'
 DESdir <-'/data2/zhoulab/yuxinghai/zju/3nd_analysis/results/03_featurecount'
 for (i in name) {
